@@ -33,6 +33,7 @@ class GameProvider extends ChangeNotifier {
   int _misses = 0;
   int _activeShield = 0;
   int _freezeBonusMs = 0;
+  bool _freezeUsedThisRound = false;
   bool _completionReported = false;
   int _remainingMs = 6000;
   Timer? _roundTimer;
@@ -60,6 +61,7 @@ class GameProvider extends ChangeNotifier {
     _reactionHistory.clear();
     _activeShield = 0;
     _freezeBonusMs = 0;
+    _freezeUsedThisRound = false;
     _completionReported = false;
     _difficulty = const DifficultySnapshot(gridSize: 4, timeLimitMs: 6000, difficultyScore: 0.4);
     _prepareRound();
@@ -71,6 +73,8 @@ class GameProvider extends ChangeNotifier {
       _analytics.track('power_up_shield');
     }
     if (type == PowerUpType.freeze) {
+      if (_freezeUsedThisRound) return;
+      _freezeUsedThisRound = true;
       _freezeBonusMs += 1200;
       _remainingMs += 1200;
       _analytics.track('power_up_freeze');
@@ -136,9 +140,7 @@ class GameProvider extends ChangeNotifier {
     );
 
     if (lives <= 0 || _gameService.isFinished(_state.level)) {
-      _roundTimer?.cancel();
-      _state = _state.copyWith(status: SessionStatus.completed);
-      notifyListeners();
+      _completeSession();
       return;
     }
 
@@ -151,6 +153,7 @@ class GameProvider extends ChangeNotifier {
     _state = _state.copyWith(eventTag: _round.eventTag);
     _remainingMs = _difficulty.timeLimitMs + _freezeBonusMs;
     _freezeBonusMs = 0;
+    _freezeUsedThisRound = false;
     _roundTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
       if (_state.status != SessionStatus.running) return;
       _remainingMs -= 100;
@@ -165,15 +168,11 @@ class GameProvider extends ChangeNotifier {
         }
         _state = _state.copyWith(lives: nextLives, combo: 0, multiplier: 1);
         if (nextLives <= 0) {
-          _roundTimer?.cancel();
-          _state = _state.copyWith(status: SessionStatus.completed);
-          notifyListeners();
+          _completeSession();
           return;
         }
         if (_gameService.isFinished(_state.level)) {
-          _roundTimer?.cancel();
-          _state = _state.copyWith(status: SessionStatus.completed);
-          notifyListeners();
+          _completeSession();
           return;
         }
         _prepareRound();
@@ -186,6 +185,12 @@ class GameProvider extends ChangeNotifier {
 
   void markCompletionReported() {
     _completionReported = true;
+  }
+
+  void _completeSession() {
+    _roundTimer?.cancel();
+    _state = _state.copyWith(status: SessionStatus.completed);
+    notifyListeners();
   }
 
   @override

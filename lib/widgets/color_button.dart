@@ -34,6 +34,10 @@ class ColorButton extends StatelessWidget {
           },
           onTapUp: (details) {
             final holdMs = DateTime.now().difference(downAt ?? DateTime.now()).inMilliseconds;
+            final previous = lastPosition;
+            if (previous != null) {
+              traveledDistance += (details.localPosition - previous).distance;
+            }
             onPressed(
               TapSample(
                 pressure: details.kind == PointerDeviceKind.touch ? 0.7 : 0.5,

@@ -53,6 +53,19 @@ void main() {
     expect(provider.remainingMs, greaterThan(provider.difficulty.timeLimitMs));
   });
 
+  test('freeze power-up cannot be stacked repeatedly in same round', () {
+    final provider = GameProvider()..startNewGame();
+    final before = provider.remainingMs;
+
+    provider.usePowerUp(PowerUpType.freeze);
+    final afterFirst = provider.remainingMs;
+    provider.usePowerUp(PowerUpType.freeze);
+    final afterSecond = provider.remainingMs;
+
+    expect(afterFirst, greaterThan(before));
+    expect(afterSecond, equals(afterFirst));
+  });
+
   test('database leaderboard load returns empty on invalid payload', () async {
     SharedPreferences.setMockInitialValues({'leaderboard_v1': 'not-valid-base64'});
     final database = DatabaseService();

@@ -10,21 +10,43 @@ import '../widgets/combo_meter.dart';
 import '../widgets/game_board.dart';
 import '../widgets/particle_widget.dart';
 
-class GameScreen extends StatelessWidget {
+class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
+
+  @override
+  State<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends State<GameScreen> {
+  bool _savingResult = false;
+
+  Future<void> _saveResultIfNeeded(GameProvider game) async {
+    if (_savingResult || game.completionReported || game.state.status != SessionStatus.completed) {
+      return;
+    }
+    _savingResult = true;
+    try {
+      await context.read<PlayerProvider>().registerResult(
+            score: game.state.score,
+            matches: game.matches,
+            misses: game.misses,
+            fastestTap: game.fastestTap,
+          );
+      game.markCompletionReported();
+    } finally {
+      _savingResult = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<GameProvider>(
       builder: (context, game, _) {
         if (game.state.status == SessionStatus.completed && !game.completionReported) {
-          context.read<PlayerProvider>().registerResult(
-            score: game.state.score,
-            matches: game.matches,
-            misses: game.misses,
-            fastestTap: game.fastestTap,
-          );
-          game.markCompletionReported();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            _saveResultIfNeeded(game);
+          });
         }
 
         return Scaffold(

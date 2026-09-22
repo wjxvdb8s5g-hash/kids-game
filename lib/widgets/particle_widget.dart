@@ -16,8 +16,18 @@ class _ParticleWidgetState extends State<ParticleWidget> {
   Timer? _ticker;
 
   @override
+  void initState() {
+    super.initState();
+    _syncTicker();
+  }
+
+  @override
   void didUpdateWidget(covariant ParticleWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _syncTicker();
+  }
+
+  void _syncTicker() {
     _ticker?.cancel();
     if (widget.particles.isNotEmpty) {
       _ticker = Timer.periodic(const Duration(milliseconds: 16), (_) {
