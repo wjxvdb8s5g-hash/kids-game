@@ -24,7 +24,9 @@ class ColorButton extends StatelessWidget {
         child: Listener(
           onPointerDown: (event) {
             pressure = event.pressure;
+            downAt = DateTime.now();
             lastPosition = event.localPosition;
+            traveledDistance = 0;
           },
           onPointerMove: (event) {
             final previous = lastPosition;
@@ -36,11 +38,6 @@ class ColorButton extends StatelessWidget {
           },
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
-            onTapDown: (details) {
-              downAt = DateTime.now();
-              lastPosition = details.localPosition;
-              traveledDistance = 0;
-            },
             onTapUp: (details) {
               final holdMs = DateTime.now().difference(downAt ?? DateTime.now()).inMilliseconds;
               final previous = lastPosition;

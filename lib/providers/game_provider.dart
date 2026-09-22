@@ -161,7 +161,8 @@ class GameProvider extends ChangeNotifier {
     _roundTimer?.cancel();
     _round = _gameService.nextRound(level: _state.level, gridSize: _difficulty.gridSize);
     _state = _state.copyWith(eventTag: _round.eventTag);
-    _remainingMs = _difficulty.timeLimitMs + _freezeBonusMs;
+    final eventTimeBonus = _round.eventTag == 'Slow Motion' ? 1000 : 0;
+    _remainingMs = _difficulty.timeLimitMs + _freezeBonusMs + eventTimeBonus;
     _freezeBonusMs = 0;
     _freezeUsedThisRound = false;
     _roundTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {

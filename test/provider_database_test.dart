@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:kids_game/core/gesture_analyzer.dart';
 import 'package:kids_game/models/power_up.dart';
 import 'package:kids_game/providers/game_provider.dart';
@@ -75,13 +76,15 @@ void main() {
     expect(entries, isEmpty);
   });
 
-  test('timeout branch reduces life when timer expires', () async {
-    final provider = GameProvider()..startNewGame();
-    addTearDown(provider.dispose);
-    final initialLives = provider.state.lives;
+  test('timeout branch reduces life when timer expires', () {
+    fakeAsync((async) {
+      final provider = GameProvider()..startNewGame();
+      final initialLives = provider.state.lives;
 
-    await Future<void>.delayed(const Duration(milliseconds: 6500));
+      async.elapse(const Duration(milliseconds: 6500));
 
-    expect(provider.state.lives, lessThan(initialLives));
+      expect(provider.state.lives, lessThan(initialLives));
+      provider.dispose();
+    });
   });
 }

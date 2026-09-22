@@ -35,7 +35,6 @@ class KidsGameApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: true,
           colorSchemeSeed: Colors.purple,
-          fontFamily: 'SF Pro Display',
         ),
         home: const SplashScreen(),
         routes: {'/home': (_) => const HomeScreen()},
