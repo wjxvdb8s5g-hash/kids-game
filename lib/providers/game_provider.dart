@@ -178,6 +178,7 @@ class GameProvider extends ChangeNotifier {
           nextLives -= 1;
         }
         _state = _state.copyWith(lives: nextLives, combo: 0, multiplier: 1);
+        notifyListeners();
         if (nextLives <= 0) {
           _completeSession();
           return;

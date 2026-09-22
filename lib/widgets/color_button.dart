@@ -7,7 +7,7 @@ class ColorButton extends StatelessWidget {
   const ColorButton({super.key, required this.color, required this.onPressed});
 
   final Color color;
-  final ValueChanged<TapSample> onPressed;
+  final void Function(TapSample tap, Offset origin) onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +50,7 @@ class ColorButton extends StatelessWidget {
                   holdMs: holdMs.clamp(10, 1200),
                   travelDistance: traveledDistance,
                 ),
+                details.localPosition,
               );
               downAt = null;
               lastPosition = null;

@@ -108,9 +108,10 @@ class _GameScreenState extends State<GameScreen> {
                           children: [
                             GameBoard(
                               colors: game.round.options,
-                              onTap: (index, tap) => game.handleTap(
+                              onTap: (index, tap, origin) => game.handleTap(
                                 index: index,
                                 tap: tap,
+                                origin: origin,
                               ),
                             ),
                             ParticleWidget(particles: game.particles),

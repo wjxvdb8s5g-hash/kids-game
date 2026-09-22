@@ -7,7 +7,7 @@ class GameBoard extends StatelessWidget {
   const GameBoard({super.key, required this.colors, required this.onTap});
 
   final List<Color> colors;
-  final void Function(int index, TapSample tap) onTap;
+  final void Function(int index, TapSample tap, Offset origin) onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,7 @@ class GameBoard extends StatelessWidget {
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
       ),
-      itemBuilder: (_, index) => ColorButton(color: colors[index], onPressed: (tap) => onTap(index, tap)),
+      itemBuilder: (_, index) => ColorButton(color: colors[index], onPressed: (tap, origin) => onTap(index, tap, origin)),
     );
   }
 }
