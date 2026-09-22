@@ -26,7 +26,10 @@ class AchievementScreen extends StatelessWidget {
                 child: ListTile(
                   title: Text(a.title, style: const TextStyle(color: ColorsPalette.text)),
                   subtitle: Text(a.description, style: const TextStyle(color: Colors.white70)),
-                  trailing: Icon(a.unlocked ? Icons.emoji_events : Icons.lock, color: a.unlocked ? Colors.amber : Colors.grey),
+                  trailing: Semantics(
+                    label: a.unlocked ? 'Açık başarı' : 'Kilitli başarı',
+                    child: Icon(a.unlocked ? Icons.emoji_events : Icons.lock, color: a.unlocked ? Colors.amber : Colors.grey),
+                  ),
                 ),
               ),
             )

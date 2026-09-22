@@ -35,6 +35,7 @@ class GameProvider extends ChangeNotifier {
   int _freezeBonusMs = 0;
   bool _freezeUsedThisRound = false;
   bool _completionReported = false;
+  int _particleBurstVersion = 0;
   int _remainingMs = 6000;
   Timer? _roundTimer;
 
@@ -113,6 +114,14 @@ class GameProvider extends ChangeNotifier {
       _matches += 1;
       _audio.playSuccess();
       _particles = _particleEngine.createBurst(origin: origin, level: _state.level);
+      _particleBurstVersion += 1;
+      final currentBurst = _particleBurstVersion;
+      final clearAfterMs = _particles.map((p) => p.lifeMs).reduce(max);
+      Future<void>.delayed(Duration(milliseconds: clearAfterMs + 40), () {
+        if (_particles.isEmpty || currentBurst != _particleBurstVersion) return;
+        _particles = const [];
+        notifyListeners();
+      });
     }
 
     final nextScore = max(0, _state.score + scoreResult.points);
@@ -189,6 +198,7 @@ class GameProvider extends ChangeNotifier {
 
   void _completeSession() {
     _roundTimer?.cancel();
+    _remainingMs = 0;
     _state = _state.copyWith(status: SessionStatus.completed);
     notifyListeners();
   }

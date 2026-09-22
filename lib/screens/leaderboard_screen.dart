@@ -22,10 +22,13 @@ class LeaderboardScreen extends StatelessWidget {
         itemCount: board.length,
         itemBuilder: (_, index) {
           final entry = board[index];
-          return ListTile(
-            leading: Text('#${index + 1}', style: const TextStyle(color: ColorsPalette.accent)),
-            title: Text('${entry['name']}', style: const TextStyle(color: ColorsPalette.text)),
-            trailing: Text('${entry['score']}', style: const TextStyle(color: ColorsPalette.text)),
+          return Semantics(
+            label: 'Sıra ${index + 1}, oyuncu ${entry['name']}, skor ${entry['score']}',
+            child: ListTile(
+              leading: Text('#${index + 1}', style: const TextStyle(color: ColorsPalette.accent)),
+              title: Text('${entry['name']}', style: const TextStyle(color: ColorsPalette.text)),
+              trailing: Text('${entry['score']}', style: const TextStyle(color: ColorsPalette.text)),
+            ),
           );
         },
       ),

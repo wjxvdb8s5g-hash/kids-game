@@ -12,7 +12,11 @@ class ComboMeter extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Combo: $combo', style: const TextStyle(color: Colors.white)),
-        LinearProgressIndicator(value: progress, minHeight: 8),
+        Semantics(
+          label: 'Combo göstergesi',
+          value: '${(progress * 100).toStringAsFixed(0)} yüzde',
+          child: LinearProgressIndicator(value: progress, minHeight: 8),
+        ),
       ],
     );
   }

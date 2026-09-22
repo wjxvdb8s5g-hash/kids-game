@@ -88,35 +88,35 @@ class _GameScreenState extends State<GameScreen> {
                 ),
                 const SizedBox(height: 14),
                 Expanded(
-                  child: Stack(
-                    children: [
-                      GameBoard(
-                        colors: game.round.options,
-                        onTap: (index, tap) => game.handleTap(
-                          index: index,
-                          tap: tap,
+                  child: game.state.status == SessionStatus.completed
+                      ? Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('Oyun Bitti', style: TextStyle(color: ColorsPalette.text, fontSize: 24)),
+                              const SizedBox(height: 8),
+                              ElevatedButton(
+                                onPressed: () {
+                                  game.startNewGame();
+                                },
+                                child: const Text('Tekrar Oyna'),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Stack(
+                          children: [
+                            GameBoard(
+                              colors: game.round.options,
+                              onTap: (index, tap) => game.handleTap(
+                                index: index,
+                                tap: tap,
+                              ),
+                            ),
+                            ParticleWidget(particles: game.particles),
+                          ],
                         ),
-                      ),
-                      ParticleWidget(particles: game.particles),
-                    ],
-                  ),
                 ),
-                if (game.state.status == SessionStatus.completed)
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        const Text('Oyun Bitti', style: TextStyle(color: ColorsPalette.text, fontSize: 24)),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: () {
-                            game.startNewGame();
-                          },
-                          child: const Text('Tekrar Oyna'),
-                        ),
-                      ],
-                    ),
-                  ),
               ],
             ),
           ),
