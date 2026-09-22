@@ -14,6 +14,7 @@ class ColorButton extends StatelessWidget {
     DateTime? downAt;
     Offset? lastPosition;
     double traveledDistance = 0;
+    double pressure = 0.5;
     return Material(
       color: color,
       borderRadius: BorderRadius.circular(16),
@@ -21,12 +22,16 @@ class ColorButton extends StatelessWidget {
         button: true,
         label: 'Renk kutusu',
         child: Listener(
+          onPointerDown: (event) {
+            pressure = event.pressure;
+          },
           onPointerMove: (event) {
             final previous = lastPosition;
             if (previous != null) {
               traveledDistance += (event.localPosition - previous).distance;
             }
             lastPosition = event.localPosition;
+            pressure = event.pressure;
           },
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
@@ -43,7 +48,7 @@ class ColorButton extends StatelessWidget {
               }
               onPressed(
                 TapSample(
-                  pressure: details.kind == PointerDeviceKind.touch ? 0.7 : 0.5,
+                  pressure: details.kind == PointerDeviceKind.touch ? pressure : 0.5,
                   holdMs: holdMs.clamp(10, 1200),
                   travelDistance: traveledDistance,
                 ),

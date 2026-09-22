@@ -194,6 +194,7 @@ class GameProvider extends ChangeNotifier {
 
   void markCompletionReported() {
     _completionReported = true;
+    notifyListeners();
   }
 
   void _completeSession() {

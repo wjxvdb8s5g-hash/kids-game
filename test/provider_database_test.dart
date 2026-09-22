@@ -74,4 +74,13 @@ void main() {
 
     expect(entries, isEmpty);
   });
+
+  test('timeout branch reduces life when timer expires', () async {
+    final provider = GameProvider()..startNewGame();
+    final initialLives = provider.state.lives;
+
+    await Future<void>.delayed(const Duration(milliseconds: 6500));
+
+    expect(provider.state.lives, lessThan(initialLives));
+  });
 }
