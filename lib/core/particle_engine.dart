@@ -6,11 +6,13 @@ class ParticleSpec {
     required this.start,
     required this.velocity,
     required this.lifeMs,
+    required this.birthEpochMs,
   });
 
   final Offset start;
   final Offset velocity;
   final int lifeMs;
+  final int birthEpochMs;
 }
 
 class ParticleEngine {
@@ -24,6 +26,7 @@ class ParticleEngine {
         start: origin,
         velocity: Offset(cos(angle) * speed, sin(angle) * speed),
         lifeMs: 600 + random.nextInt(700),
+        birthEpochMs: DateTime.now().millisecondsSinceEpoch,
       );
     });
   }

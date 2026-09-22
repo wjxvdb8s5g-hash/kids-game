@@ -28,7 +28,9 @@ class PlayerProvider extends ChangeNotifier {
       highScore: score > _player.highScore ? score : _player.highScore,
       totalMatches: _player.totalMatches + matches,
       totalMisses: _player.totalMisses + misses,
-      fastestTapMs: fastestTap < _player.fastestTapMs ? fastestTap : _player.fastestTapMs,
+      fastestTapMs: fastestTap >= 9999
+          ? _player.fastestTapMs
+          : (fastestTap < _player.fastestTapMs ? fastestTap : _player.fastestTapMs),
     );
 
     final nextBoard = [..._leaderboard];

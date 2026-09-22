@@ -41,9 +41,14 @@ class DatabaseService {
     final prefs = await SharedPreferences.getInstance();
     final encrypted = prefs.getString(_scoresKey);
     if (encrypted == null) return [];
-    final raw = _decrypt(encrypted);
-    final decoded = jsonDecode(raw) as List<dynamic>;
-    return decoded.cast<Map<String, dynamic>>();
+    try {
+      final raw = _decrypt(encrypted);
+      final decoded = jsonDecode(raw);
+      if (decoded is! List) return [];
+      return decoded.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<void> saveLeaderboard(List<Map<String, dynamic>> entries) async {

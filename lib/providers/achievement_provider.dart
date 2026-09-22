@@ -24,9 +24,15 @@ class AchievementProvider extends ChangeNotifier {
       final unlocked = switch (achievement.id) {
         'first_hit' => player.totalMatches >= 1,
         'sharp_eye' => (player.accuracy * 100) >= 70,
+        'combo_5' => player.totalMatches >= 5,
         'score_500' => player.highScore >= 500,
         'speedster' => player.fastestTapMs <= 350,
-        _ => player.unlockedAchievements.contains(achievement.id),
+        'level_5' => player.highScore >= 250,
+        'clean_round' => player.totalMatches >= 10 && player.totalMisses == 0,
+        'event_hunter' => player.totalMatches >= 15,
+        'streak_20' => player.totalMatches >= 20,
+        'legend_seed' => player.highScore >= 750,
+        _ => false,
       };
       return achievement.copyWith(unlocked: unlocked);
     }).toList();

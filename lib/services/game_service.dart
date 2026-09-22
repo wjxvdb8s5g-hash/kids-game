@@ -23,14 +23,14 @@ class GameRound {
 
 class GameService {
   final _colorGenerator = const ColorGenerator();
+  final Random _random = Random();
 
   GameRound nextRound({required int level, required int gridSize}) {
-    final random = Random(level * 17 + gridSize);
     final options = _colorGenerator.generatePalette(level: level, size: gridSize);
-    final correctIndex = random.nextInt(options.length);
+    final correctIndex = _random.nextInt(options.length);
 
-    final hasEvent = random.nextDouble() > 0.8;
-    final eventTag = hasEvent ? (random.nextBool() ? 'Double Points' : 'Slow Motion') : '';
+    final hasEvent = _random.nextDouble() > 0.8;
+    final eventTag = hasEvent ? (_random.nextBool() ? 'Double Points' : 'Slow Motion') : '';
     final eventMultiplier = eventTag == 'Double Points' ? 2.0 : 1.0;
 
     return GameRound(

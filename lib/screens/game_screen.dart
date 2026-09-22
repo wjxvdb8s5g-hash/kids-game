@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../config/colors_palette.dart';
-import '../core/gesture_analyzer.dart';
 import '../models/game_state.dart';
 import '../models/power_up.dart';
 import '../providers/game_provider.dart';
@@ -44,6 +43,7 @@ class GameScreen extends StatelessWidget {
                   children: [
                     Text('Puan: ${game.state.score}', style: const TextStyle(color: ColorsPalette.text, fontSize: 18)),
                     Text('Can: ${game.state.lives}', style: const TextStyle(color: ColorsPalette.text, fontSize: 18)),
+                    Text('Süre: ${(game.remainingMs / 1000).toStringAsFixed(1)}', style: const TextStyle(color: ColorsPalette.text, fontSize: 18)),
                     Text('x${game.state.multiplier}', style: const TextStyle(color: ColorsPalette.accent, fontSize: 18)),
                   ],
                 ),
@@ -70,9 +70,9 @@ class GameScreen extends StatelessWidget {
                     children: [
                       GameBoard(
                         colors: game.round.options,
-                        onTap: (index) => game.handleTap(
+                        onTap: (index, tap) => game.handleTap(
                           index: index,
-                          tap: const TapSample(pressure: 0.7, holdMs: 220, travelDistance: 3),
+                          tap: tap,
                         ),
                       ),
                       ParticleWidget(particles: game.particles),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -32,6 +33,8 @@ class GameProvider extends ChangeNotifier {
   int _misses = 0;
   int _activeShield = 0;
   bool _completionReported = false;
+  int _remainingMs = 6000;
+  Timer? _roundTimer;
 
   final List<PowerUp> _powerUps = const [
     PowerUp(type: PowerUpType.freeze, name: 'Freeze Mode', description: '1 tur süreyi artırır', cooldownMs: 0),
@@ -47,6 +50,7 @@ class GameProvider extends ChangeNotifier {
   int get misses => _misses;
   int get fastestTap => _reactionHistory.isEmpty ? 9999 : _reactionHistory.reduce(min);
   bool get completionReported => _completionReported;
+  int get remainingMs => _remainingMs;
 
   void startNewGame() {
     _state = GameState.initial.copyWith(status: SessionStatus.running, lives: AppConstants.initialLives);
@@ -55,6 +59,7 @@ class GameProvider extends ChangeNotifier {
     _reactionHistory.clear();
     _activeShield = 0;
     _completionReported = false;
+    _difficulty = const DifficultySnapshot(gridSize: 4, timeLimitMs: 6000, difficultyScore: 0.4);
     _prepareRound();
   }
 
@@ -64,11 +69,7 @@ class GameProvider extends ChangeNotifier {
       _analytics.track('power_up_shield');
     }
     if (type == PowerUpType.freeze) {
-      _difficulty = DifficultySnapshot(
-        gridSize: _difficulty.gridSize,
-        timeLimitMs: _difficulty.timeLimitMs + 1200,
-        difficultyScore: _difficulty.difficultyScore,
-      );
+      _remainingMs += 1200;
       _analytics.track('power_up_freeze');
     }
     notifyListeners();
@@ -132,6 +133,7 @@ class GameProvider extends ChangeNotifier {
     );
 
     if (lives <= 0 || _gameService.isFinished(_state.level)) {
+      _roundTimer?.cancel();
       _state = _state.copyWith(status: SessionStatus.completed);
       notifyListeners();
       return;
@@ -141,12 +143,39 @@ class GameProvider extends ChangeNotifier {
   }
 
   void _prepareRound() {
+    _roundTimer?.cancel();
     _round = _gameService.nextRound(level: _state.level, gridSize: _difficulty.gridSize);
     _state = _state.copyWith(eventTag: _round.eventTag);
+    _remainingMs = _difficulty.timeLimitMs;
+    _roundTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+      if (_state.status != SessionStatus.running) return;
+      _remainingMs -= 100;
+      if (_remainingMs <= 0) {
+        _remainingMs = 0;
+        _misses += 1;
+        final nextLives = _state.lives - 1;
+        _state = _state.copyWith(lives: nextLives, combo: 0, multiplier: 1);
+        if (nextLives <= 0) {
+          _roundTimer?.cancel();
+          _state = _state.copyWith(status: SessionStatus.completed);
+          notifyListeners();
+          return;
+        }
+        _prepareRound();
+        return;
+      }
+      notifyListeners();
+    });
     notifyListeners();
   }
 
   void markCompletionReported() {
     _completionReported = true;
+  }
+
+  @override
+  void dispose() {
+    _roundTimer?.cancel();
+    super.dispose();
   }
 }

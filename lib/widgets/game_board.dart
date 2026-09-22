@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../core/gesture_analyzer.dart';
 import 'color_button.dart';
 
 class GameBoard extends StatelessWidget {
   const GameBoard({super.key, required this.colors, required this.onTap});
 
   final List<Color> colors;
-  final ValueChanged<int> onTap;
+  final void Function(int index, TapSample tap) onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class GameBoard extends StatelessWidget {
         crossAxisSpacing: 8,
         mainAxisSpacing: 8,
       ),
-      itemBuilder: (_, index) => ColorButton(color: colors[index], onPressed: () => onTap(index)),
+      itemBuilder: (_, index) => ColorButton(color: colors[index], onPressed: (tap) => onTap(index, tap)),
     );
   }
 }
