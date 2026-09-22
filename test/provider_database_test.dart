@@ -32,6 +32,15 @@ void main() {
     expect(provider.completionReported, isTrue);
   });
 
+  test('freeze power-up extends active round timer', () {
+    final provider = GameProvider()..startNewGame();
+    final before = provider.remainingMs;
+
+    provider.usePowerUp(PowerUpType.freeze);
+
+    expect(provider.remainingMs, greaterThan(before));
+  });
+
   test('database leaderboard load returns empty on invalid payload', () async {
     SharedPreferences.setMockInitialValues({'leaderboard_v1': 'not-valid-base64'});
     final database = DatabaseService();

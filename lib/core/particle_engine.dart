@@ -16,16 +16,17 @@ class ParticleSpec {
 }
 
 class ParticleEngine {
+  final Random _random = Random();
+
   List<ParticleSpec> createBurst({required Offset origin, required int level}) {
-    final random = Random(level * 31);
     final count = (10 + level * 1.3).toInt().clamp(12, 28);
     return List.generate(count, (_) {
-      final angle = random.nextDouble() * 2 * pi;
-      final speed = 40 + random.nextDouble() * 120;
+      final angle = _random.nextDouble() * 2 * pi;
+      final speed = 40 + _random.nextDouble() * 120;
       return ParticleSpec(
         start: origin,
         velocity: Offset(cos(angle) * speed, sin(angle) * speed),
-        lifeMs: 600 + random.nextInt(700),
+        lifeMs: 600 + _random.nextInt(700),
         birthEpochMs: DateTime.now().millisecondsSinceEpoch,
       );
     });

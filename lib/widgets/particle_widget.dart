@@ -59,7 +59,8 @@ class _ParticlePainter extends CustomPainter {
       if (age < 0 || age > particle.lifeMs) {
         continue;
       }
-      final t = age / 1000.0;
+      final progress = (age / particle.lifeMs).clamp(0.0, 1.0);
+      final t = progress * (particle.lifeMs / 1000.0);
       final drag = 0.87;
       final pos = Offset(
         particle.start.dx + particle.velocity.dx * t * drag,
