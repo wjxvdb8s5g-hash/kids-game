@@ -50,4 +50,25 @@ void main() {
     await tester.pump();
     expect(player.saveCalls, 1);
   });
+
+  testWidgets('game screen power-up buttons trigger provider behavior', (tester) async {
+    final game = GameProvider()..startNewGame();
+    final player = _FakePlayerProvider();
+    final before = game.remainingMs;
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<GameProvider>.value(value: game),
+          ChangeNotifierProvider<PlayerProvider>.value(value: player),
+        ],
+        child: const MaterialApp(home: GameScreen()),
+      ),
+    );
+
+    await tester.tap(find.text('Freeze'));
+    await tester.pump();
+
+    expect(game.remainingMs, greaterThan(before));
+  });
 }

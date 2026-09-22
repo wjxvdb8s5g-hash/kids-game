@@ -45,10 +45,23 @@ class _ParticleWidgetState extends State<ParticleWidget> {
   @override
   Widget build(BuildContext context) {
     if (widget.particles.isEmpty) return const SizedBox.shrink();
+    final box = context.findRenderObject() as RenderBox?;
+    final particlesInLocal = box == null
+        ? widget.particles
+        : widget.particles
+            .map(
+              (p) => ParticleSpec(
+                start: box.globalToLocal(p.start),
+                velocity: p.velocity,
+                lifeMs: p.lifeMs,
+                birthEpochMs: p.birthEpochMs,
+              ),
+            )
+            .toList();
 
     return IgnorePointer(
       child: CustomPaint(
-        painter: _ParticlePainter(widget.particles),
+        painter: _ParticlePainter(particlesInLocal),
         child: const SizedBox.expand(),
       ),
     );

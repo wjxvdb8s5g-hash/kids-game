@@ -38,6 +38,7 @@ class GameProvider extends ChangeNotifier {
   int _particleBurstVersion = 0;
   int _remainingMs = 6000;
   Timer? _roundTimer;
+  bool _disposed = false;
 
   final List<PowerUp> _powerUps = const [
     PowerUp(type: PowerUpType.freeze, name: 'Freeze Mode', description: '1 tur süreyi artırır', cooldownMs: 0),
@@ -70,16 +71,22 @@ class GameProvider extends ChangeNotifier {
   }
 
   void usePowerUp(PowerUpType type) {
-    if (type == PowerUpType.shield) {
-      _activeShield = 1;
-      _analytics.track('power_up_shield');
-    }
-    if (type == PowerUpType.freeze) {
-      if (_freezeUsedThisRound) return;
-      _freezeUsedThisRound = true;
-      _freezeBonusMs += 1200;
-      _remainingMs += 1200;
-      _analytics.track('power_up_freeze');
+    switch (type) {
+      case PowerUpType.shield:
+        _activeShield = 1;
+        _analytics.track('power_up_shield');
+        break;
+      case PowerUpType.freeze:
+        if (_freezeUsedThisRound) return;
+        _freezeUsedThisRound = true;
+        _freezeBonusMs += 1200;
+        _remainingMs += 1200;
+        _analytics.track('power_up_freeze');
+        break;
+      case PowerUpType.magnet:
+      case PowerUpType.doubleSpeed:
+        _analytics.track('power_up_unsupported', payload: {'type': type.name});
+        break;
     }
     notifyListeners();
   }
@@ -119,7 +126,7 @@ class GameProvider extends ChangeNotifier {
       final currentBurst = _particleBurstVersion;
       final clearAfterMs = _particles.map((p) => p.lifeMs).reduce(max);
       Future<void>.delayed(Duration(milliseconds: clearAfterMs + 40), () {
-        if (_particles.isEmpty || currentBurst != _particleBurstVersion) return;
+        if (_disposed || _particles.isEmpty || currentBurst != _particleBurstVersion) return;
         _particles = const [];
         notifyListeners();
       });
@@ -177,7 +184,7 @@ class GameProvider extends ChangeNotifier {
           _misses += 1;
           nextLives -= 1;
         }
-        _state = _state.copyWith(lives: nextLives, combo: 0, multiplier: 1);
+        _state = _state.copyWith(lives: nextLives, combo: 0, multiplier: 1, eventTag: 'Timeout');
         notifyListeners();
         if (nextLives <= 0) {
           _completeSession();
@@ -209,6 +216,7 @@ class GameProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     _roundTimer?.cancel();
     super.dispose();
   }

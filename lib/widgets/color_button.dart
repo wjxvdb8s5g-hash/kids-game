@@ -50,7 +50,7 @@ class ColorButton extends StatelessWidget {
                   holdMs: holdMs.clamp(10, 1200),
                   travelDistance: traveledDistance,
                 ),
-                details.localPosition,
+                details.globalPosition,
               );
               downAt = null;
               lastPosition = null;
