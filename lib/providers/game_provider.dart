@@ -17,7 +17,7 @@ import '../services/game_service.dart';
 
 class GameProvider extends ChangeNotifier {
   final GameService _gameService = GameService();
-  final DifficultyEngine _difficultyEngine = DifficultyEngine();
+  DifficultyEngine _difficultyEngine = DifficultyEngine();
   final GestureAnalyzer _gestureAnalyzer = GestureAnalyzer();
   final ScoreCalculator _scoreCalculator = ScoreCalculator();
   final ParticleEngine _particleEngine = ParticleEngine();
@@ -64,6 +64,7 @@ class GameProvider extends ChangeNotifier {
     _freezeBonusMs = 0;
     _freezeUsedThisRound = false;
     _completionReported = false;
+    _difficultyEngine = DifficultyEngine();
     _difficulty = const DifficultySnapshot(gridSize: 4, timeLimitMs: 6000, difficultyScore: 0.4);
     _prepareRound();
   }

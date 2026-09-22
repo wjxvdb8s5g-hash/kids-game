@@ -77,6 +77,7 @@ void main() {
 
   test('timeout branch reduces life when timer expires', () async {
     final provider = GameProvider()..startNewGame();
+    addTearDown(provider.dispose);
     final initialLives = provider.state.lives;
 
     await Future<void>.delayed(const Duration(milliseconds: 6500));

@@ -24,7 +24,7 @@ class PlayerProvider extends ChangeNotifier {
     required int misses,
     required int fastestTap,
   }) async {
-    _player = _player.copyWith(
+    final nextPlayer = _player.copyWith(
       highScore: score > _player.highScore ? score : _player.highScore,
       totalMatches: _player.totalMatches + matches,
       totalMisses: _player.totalMisses + misses,
@@ -34,12 +34,14 @@ class PlayerProvider extends ChangeNotifier {
     );
 
     final nextBoard = [..._leaderboard];
-    nextBoard.add({'name': _player.name, 'score': score, 'date': DateTime.now().toIso8601String()});
+    nextBoard.add({'name': nextPlayer.name, 'score': score, 'date': DateTime.now().toIso8601String()});
     nextBoard.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
-    _leaderboard = nextBoard.take(20).toList();
+    final nextLeaderboard = nextBoard.take(20).toList();
 
-    await _databaseService.savePlayer(_player);
-    await _databaseService.saveLeaderboard(_leaderboard);
+    await _databaseService.savePlayer(nextPlayer);
+    await _databaseService.saveLeaderboard(nextLeaderboard);
+    _player = nextPlayer;
+    _leaderboard = nextLeaderboard;
     notifyListeners();
   }
 

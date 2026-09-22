@@ -24,6 +24,7 @@ class ColorButton extends StatelessWidget {
         child: Listener(
           onPointerDown: (event) {
             pressure = event.pressure;
+            lastPosition = event.localPosition;
           },
           onPointerMove: (event) {
             final previous = lastPosition;
@@ -53,6 +54,9 @@ class ColorButton extends StatelessWidget {
                   travelDistance: traveledDistance,
                 ),
               );
+              downAt = null;
+              lastPosition = null;
+              traveledDistance = 0;
             },
           ),
         ),
