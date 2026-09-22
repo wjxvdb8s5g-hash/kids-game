@@ -41,6 +41,18 @@ void main() {
     expect(provider.remainingMs, greaterThan(before));
   });
 
+  test('freeze bonus is carried into next prepared round', () {
+    final provider = GameProvider()..startNewGame();
+
+    provider.usePowerUp(PowerUpType.freeze);
+    provider.handleTap(
+      index: provider.round.correctIndex,
+      tap: const TapSample(pressure: 0.8, holdMs: 180, travelDistance: 1),
+    );
+
+    expect(provider.remainingMs, greaterThan(provider.difficulty.timeLimitMs));
+  });
+
   test('database leaderboard load returns empty on invalid payload', () async {
     SharedPreferences.setMockInitialValues({'leaderboard_v1': 'not-valid-base64'});
     final database = DatabaseService();

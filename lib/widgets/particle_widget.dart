@@ -60,11 +60,11 @@ class _ParticlePainter extends CustomPainter {
         continue;
       }
       final progress = (age / particle.lifeMs).clamp(0.0, 1.0);
-      final t = progress * (particle.lifeMs / 1000.0);
-      final drag = 0.87;
+      final progressCurve = progress * (1 - progress * 0.22);
+      const drag = 0.87;
       final pos = Offset(
-        particle.start.dx + particle.velocity.dx * t * drag,
-        particle.start.dy + particle.velocity.dy * t * drag + (28 * t * t),
+        particle.start.dx + particle.velocity.dx * progressCurve * drag,
+        particle.start.dy + particle.velocity.dy * progressCurve * drag + (28 * progress * progress),
       );
       canvas.drawCircle(pos, 2.5, paint);
     }

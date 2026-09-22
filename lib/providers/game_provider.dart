@@ -170,6 +170,12 @@ class GameProvider extends ChangeNotifier {
           notifyListeners();
           return;
         }
+        if (_gameService.isFinished(_state.level)) {
+          _roundTimer?.cancel();
+          _state = _state.copyWith(status: SessionStatus.completed);
+          notifyListeners();
+          return;
+        }
         _prepareRound();
         return;
       }

@@ -12,28 +12,37 @@ class ColorButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     DateTime? downAt;
-    Offset? downPosition;
+    Offset? lastPosition;
+    double traveledDistance = 0;
     return Material(
       color: color,
       borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTapDown: (details) {
-          downAt = DateTime.now();
-          downPosition = details.localPosition;
+      child: Listener(
+        onPointerMove: (event) {
+          final previous = lastPosition;
+          if (previous != null) {
+            traveledDistance += (event.localPosition - previous).distance;
+          }
+          lastPosition = event.localPosition;
         },
-        onTapUp: (details) {
-          final holdMs = DateTime.now().difference(downAt ?? DateTime.now()).inMilliseconds;
-          final start = downPosition ?? details.localPosition;
-          final distance = (details.localPosition - start).distance;
-          onPressed(
-            TapSample(
-              pressure: details.kind == PointerDeviceKind.touch ? 0.7 : 0.5,
-              holdMs: holdMs.clamp(10, 1200),
-              travelDistance: distance,
-            ),
-          );
-        },
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTapDown: (details) {
+            downAt = DateTime.now();
+            lastPosition = details.localPosition;
+            traveledDistance = 0;
+          },
+          onTapUp: (details) {
+            final holdMs = DateTime.now().difference(downAt ?? DateTime.now()).inMilliseconds;
+            onPressed(
+              TapSample(
+                pressure: details.kind == PointerDeviceKind.touch ? 0.7 : 0.5,
+                holdMs: holdMs.clamp(10, 1200),
+                travelDistance: traveledDistance,
+              ),
+            );
+          },
+        ),
       ),
     );
   }
