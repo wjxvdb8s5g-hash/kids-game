@@ -1,0 +1,58 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build-android-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Generate Android platform files
+        run: flutter create . --platforms=android --project-name kids_game --org com.kidsgame.app
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Prepare release artifact
+        run: cp build/app/outputs/flutter-apk/app-release.apk build/app/outputs/flutter-apk/kids-game.apk
+
+      - name: Publish APK to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-apk-latest
+          name: Android APK (Latest)
+          body: |
+            Android için en güncel APK dosyası.
+            İndirme: https://github.com/${{ github.repository }}/releases/latest/download/kids-game.apk
+          files: build/app/outputs/flutter-apk/kids-game.apk
+          make_latest: true
+          overwrite_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
